@@ -1,0 +1,337 @@
+GITHUB သို့ Project တင်ရန် Git လမ်းညွှန် (မြန်မာ)
+=================================================
+
+ဤလမ်းညွှန်သည် Windows PowerShell နှင့် D:\learn_react_and_nextjs\authentication_ project အတွက် ရေးထားသည်။ Git ကို စတင်ခြင်း၊ GitHub repository ချိတ်ခြင်း၊ commit/push လုပ်ခြင်း၊ branch အသုံးပြုခြင်းနှင့် နေ့စဉ်အသုံးများသော command များကို အဆင့်လိုက် ရှင်းပြထားသည်။
+
+အရေးကြီးသော လုံခြုံရေးမှတ်ချက်
+-----------------------------
+- .env ဖိုင်တွင် DATABASE_URL၊ SESSION_SECRET၊ password စသည့် လျှို့ဝှက်တန်ဖိုးများ ပါနိုင်သဖြင့် GitHub သို့ မတင်ပါနှင့်။
+- note.txt ထဲတွင် လျှို့ဝှက်တန်ဖိုး ပါနိုင်ပါက မတင်ပါနှင့်။
+- .env.example ထဲတွင် တကယ့် secret မဟုတ်သော placeholder တန်ဖိုးများသာ ရှိကြောင်း စစ်ဆေးပါ။
+- Secret ကို GitHub သို့ တင်ပြီးသားဖြစ်ပါက ဖိုင်ကိုဖျက်ရုံဖြင့် မလုံလောက်ပါ။ အဲဒီ secret ကို သက်ဆိုင်ရာ service မှာ ချက်ချင်းအသစ်ပြောင်းပါ။
+- GitHub အကြံပြုချက်များ: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository
+
+အဆင့် ၁ - Project folder ထဲဝင်ပြီး Git ရှိမရှိ စစ်ရန်
+---------------------------------------------------
+
+Set-Location 'D:\learn_react_and_nextjs\authentication_'
+git --version
+git status
+
+Set-Location က PowerShell ၏ လက်ရှိ folder ကို project folder သို့ ပြောင်းပေးသည်။ git --version က Git ကို install လုပ်ထားခြင်း ရှိမရှိ စစ်ပေးသည်။ git status က repository အခြေအနေနှင့် ပြောင်းလဲထားသော ဖိုင်များကို ပြသည်။
+
+git status က ဒီ folder သည် Git repository မဟုတ်ကြောင်းပြမှသာ Git ကို စတင်ပါ:
+
+git init -b main
+
+ဤ command သည် .git မှတ်တမ်း folder ကိုဖန်တီးပြီး main အမည်ရှိ ပထမ branch ကို စတင်သည်။ git status က repository ရှိနေပြီဟုပြပါက git init ကို ထပ်မလုပ်ပါနှင့်။
+
+အဆင့် ၂ - .gitignore ဖန်တီးခြင်း/ပြင်ဆင်ခြင်း
+----------------------------------------------
+
+Project root ထဲတွင် .gitignore အမည်ရှိ ဖိုင်ကို ဖန်တီးပြီး အောက်ပါစာသားကို ထည့်ပါ:
+
+node_modules/
+.next/
+out/
+build/
+coverage/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+note.txt
+
+အဓိပ္ပာယ်:
+- node_modules/ သည် install လုပ်ထားသော package များ ဖြစ်ပြီး project code မဟုတ်ပါ။ package-lock.json ရှိသောကြောင့် နောက်မှ ပြန် install လုပ်နိုင်သည်။
+- .next/ သည် Next.js build/development output ဖြစ်သည်။
+- out/, build/, coverage/ တို့သည် ထုတ်လုပ်ထားသော output ဖိုင်များ ဖြစ်နိုင်သည်။
+- .env နှင့် .env.* သည် environment configuration နှင့် secret များ ဖြစ်နိုင်သည်။
+- !.env.example သည် လျှို့ဝှက်တန်ဖိုးမပါသော example config ကို Git ထဲထည့်ခွင့်ပေးသည်။ အဲဒီဖိုင်ထဲတွင် တကယ့် secret မပါကြောင်း စစ်ပါ။
+- *.tsbuildinfo သည် TypeScript incremental build cache ဖြစ်သည်။
+- note.txt သည် လိုအပ်ပါက ဖယ်ရှားနိုင်သည်။ လျှို့ဝှက်တန်ဖိုး ပါနိုင်လျှင် GitHub သို့ မတင်ပါနှင့်။
+
+Ignore စည်းမျဉ်းနှင့် status ကို စစ်ရန်:
+
+git check-ignore -v .env note.txt node_modules/ .next/
+git status --short
+
+git check-ignore က ဘယ် .gitignore စည်းမျဉ်းကြောင့် ဖိုင်ကို ignore လုပ်ထားသလဲ ပြသည်။ git status --short ထဲတွင် .env နှင့် မတင်လိုသောဖိုင်များ မပါကြောင်း စစ်ပါ။
+
+.env ကို ယခင်က Git က ခြေရာခံထားပြီးသားဖြစ်ပါက Git index မှ ဖယ်ရန်:
+
+git rm --cached -- .env
+
+ဤ command သည် Git ခြေရာခံမှုကို ဖယ်သည်။ ကွန်ပျူတာပေါ်က .env ဖိုင်ကို မဖျက်ပါ။ note.txt ကိုလည်း Git က ခြေရာခံထားပြီး ဖယ်လိုလျှင်:
+
+git rm --cached -- note.txt
+
+အဆင့် ၃ - Commit အတွက် နာမည်နှင့် email သတ်မှတ်ရန်
+--------------------------------------------------
+
+git config --global user.name "Your Name"
+git config --global user.email "YOUR-EMAIL"
+
+Your Name ကို မိမိနာမည်၊ YOUR-EMAIL ကို GitHub နှင့် သုံးသော email ဖြင့် အစားထိုးပါ။ ဤအချက်အလက်များသည် commit မှတ်တမ်းတွင် ဘယ်သူရေးခဲ့သလဲဆိုသည်ကို ဖော်ပြသည်။
+
+သတ်မှတ်ထားသောတန်ဖိုးကို စစ်ရန်:
+
+git config --global --get user.name
+git config --global --get user.email
+
+--global သည် ဒီကွန်ပျူတာပေါ်ရှိ repository အားလုံးအတွက် သတ်မှတ်သည်။ Project တစ်ခုအတွက်သာ သတ်မှတ်လိုလျှင် --global ကို ဖြုတ်ပြီး project folder ထဲတွင် command ကို run ပါ။
+
+အဆင့် ၄ - GitHub တွင် repository အသစ်ဖန်တီးရန်
+------------------------------------------------
+
+1. GitHub သို့ ဝင်ပြီး New repository ကို ရွေးပါ။
+2. Repository name ကို ရွေးပါ။ ဥပမာ authentication-app။
+3. ကိုယ်ပိုင်သင်ယူမှု project အတွက် Private ရွေးနိုင်သည်။
+4. Local project တွင် ဖိုင်များရှိပြီးသားဖြစ်သောကြောင့် GitHub အသစ်ဖန်တီးရာတွင် README၊ .gitignore၊ license ကို အစကတည်းက မရွေးဘဲ အလွတ်ထားပါ။
+5. ဖန်တီးပြီးနောက် GitHub ပြသသော HTTPS URL ကို ကူးယူပါ။ ဥပမာ:
+   https://github.com/YOUR-USERNAME/YOUR-REPO.git
+
+GitHub လမ်းညွှန်: https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github
+
+အဆင့် ၅ - ဖိုင်များကို stage လုပ်၊ စစ်ပြီး commit လုပ်ရန်
+-------------------------------------------------------
+
+git status
+git add .
+git status
+git diff --cached --name-only
+git diff --cached --stat
+
+git add . သည် project ထဲက ignore မလုပ်ထားသော ပြောင်းလဲမှုများကို stage လုပ်သည်။ Stage ဆိုသည်မှာ နောက် commit ထဲ ထည့်မည့် ပြောင်းလဲမှုများကို ရွေးမှတ်ခြင်းဖြစ်သည်။
+git diff --cached --name-only က commit ထဲဝင်မည့် ဖိုင်အမည်များကိုသာ စာရင်းပြသည်။
+git diff --cached --stat က stage လုပ်ထားသော ပြောင်းလဲမှု အကျဉ်းချုပ်ကို ပြသည်။
+
+Commit မလုပ်ခင် .env၊ note.txt၊ node_modules၊ .next မပါကြောင်း စစ်ပါ။ ပြီးလျှင်:
+
+git commit -m "chore: initialize employee authentication app"
+
+Commit သည် အဲဒီအချိန်က project ပြောင်းလဲမှုများ၏ မှတ်တမ်းတစ်ခုဖြစ်သည်။ Message ကို တိုတိုနှင့် ဘာပြောင်းလဲခဲ့သည်ဆိုတာ ဖော်ပြအောင်ရေးပါ။
+
+အဆင့် ၆ - GitHub remote ချိတ်ပြီး main ကို push လုပ်ရန်
+-----------------------------------------------------
+
+Remote ရှိမရှိ စစ်ရန်:
+
+git remote -v
+
+origin မရှိသေးလျှင် အောက်ပါ command ဖြင့် ထည့်ပါ:
+
+git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO.git
+
+origin ရှိပြီး URL ကို ပြောင်းလိုလျှင်:
+
+git remote set-url origin https://github.com/YOUR-USERNAME/YOUR-REPO.git
+
+ထို့နောက် main ကို GitHub သို့ ပထမဆုံး push လုပ်ရန်:
+
+git push -u origin main
+
+origin သည် GitHub repository အတွက် ဒေသတွင်းသတ်မှတ်ထားသော အတိုကောက်နာမည်ဖြစ်သည်။ -u သည် local main နှင့် remote origin/main အကြား tracking ချိတ်ဆက်မှု တည်ဆောက်ပေးသည်။ နောက်တစ်ကြိမ် main branch ပေါ်တွင် git push ဟုသာ ရိုက်နိုင်သည်။ GitHub sign-in မေးလာပါက သင့် GitHub account ကို အတည်ပြုပါ။
+
+Push ပြီးလျှင် GitHub repository စာမျက်နှာကိုဖွင့်ပြီး ဖိုင်များရောက်မရောက် စစ်ပါ။ Local အခြေအနေစစ်ရန်:
+
+git status
+git log --oneline --decorate -5
+
+Branch တွေ၏ ရည်ရွယ်ချက်နှင့် အမည်ပေးပုံ
+---------------------------------------
+
+main
+- အသုံးပြုရန် အဆင်သင့်ဖြစ်သော၊ တည်ငြိမ်သည့် project version ကို ထားရန်။
+- Feature များစမ်းသပ်ပြီးမှ ဒီ branch ထဲပေါင်းရန်။
+
+feature/<အကြောင်းအရာ>
+- Feature တစ်ခုကို သီးခြားလုပ်ဆောင်ရန်။ ဥပမာ:
+  feature/employee-auth
+  feature/employee-dashboard
+  feature/tailwind-ui
+
+fix/<ပြဿနာ>
+- Bug သို့မဟုတ် ပြဿနာတစ်ခုကို သီးခြားပြင်ရန်။ ဥပမာ:
+  fix/session-timeout
+  fix/login-validation
+
+products
+- Project တွင် product catalog သို့မဟုတ် product feature တစ်ခုလုပ်ရန် ရှိမှသာ feature/products လို branch နာမည်ပေးနိုင်သည်။ ဒီ employee-authentication project မှာ products feature မရှိသေးလျှင် products branch ကို မလိုပါ။
+
+develop
+- Feature အများအပြားကို main ထဲမပေါင်းမီ အဖွဲ့ဝင်တွေက စုပေါင်းစစ်ဆေးရန် အသုံးပြုနိုင်သည်။ တစ်ယောက်တည်းအလုပ်လုပ်သော project အတွက် မဖြစ်မနေ မလိုအပ်ပါ။
+
+Branch သည် project ဖိုင်အုပ်စုတစ်ခုကို မဆိုလိုပါ။ Branch တစ်ခုသည် project commit history တစ်ခုလုံးအပေါ် အခြေခံပြီး သီးခြားအလုပ်လုပ်နိုင်သည့် လမ်းကြောင်းဖြစ်သည်။ Branch ခွဲခြင်းကြောင့် main ကို တည်ငြိမ်စွာထားနိုင်ပြီး feature မပြီးခင် main ကို မထိခိုက်စေဘဲ ပြောင်းလဲမှုများကို စစ်ဆေးနိုင်သည်။
+
+Feature branch တစ်ခုနဲ့ အလုပ်လုပ်သည့် အကြံပြု workflow
+-------------------------------------------------------
+
+1. Main ကို နောက်ဆုံးအခြေအနေသို့ အပ်ဒိတ်လုပ်ပါ:
+
+git switch main
+git pull origin main
+
+2. Feature branch အသစ်ဖန်တီးပါ:
+
+git switch -c feature/employee-dashboard
+
+git switch -c သည် branch အသစ်ဖန်တီးပြီး ထို branch သို့ ချက်ချင်းပြောင်းသည်။
+
+3. Code ပြင်ပြီး ပြောင်းလဲမှုများကို စစ်ပါ၊ commit လုပ်ပါ:
+
+git status
+git diff
+git add .
+git status
+git diff --cached --name-only
+git commit -m "feat: improve employee dashboard"
+
+4. Feature branch ကို GitHub သို့ ပထမဆုံးအကြိမ် push လုပ်ပါ:
+
+git push -u origin feature/employee-dashboard
+
+5. GitHub website ပေါ်တွင် feature/employee-dashboard ကို main ထဲသို့ ပေါင်းရန် Pull Request ဖွင့်ပါ။ ပြောင်းလဲမှုကို ပြန်စစ်ပြီး merge လုပ်ပါ။
+
+6. Merge ပြီးလျှင် local main ကို အပ်ဒိတ်လုပ်ပြီး အသုံးမလိုတော့သော branch ကို ဖယ်ပါ:
+
+git switch main
+git pull origin main
+git branch -d feature/employee-dashboard
+git push origin --delete feature/employee-dashboard
+
+git branch -d သည် local branch ကို ဖယ်သည်။ git push origin --delete သည် GitHub ပေါ် branch ကို ဖယ်သည်။ -d သည် merge မပြီးသော branch ကို မတော်တဆဖျက်ခြင်းမှ ကာကွယ်ပေးသည်။
+
+Pull Request မသုံးဘဲ local main ထဲသို့ ကိုယ်တိုင်ပေါင်းရန် လိုအပ်သောအခါ:
+
+git switch main
+git pull origin main
+git merge --no-ff feature/employee-dashboard
+git push origin main
+
+နေ့စဉ်အသုံးများသော Git command များ
+-----------------------------------
+
+အလုပ်လုပ်နေသော branch နှင့် ဖိုင်အခြေအနေကို ကြည့်ရန်:
+
+git status
+git status --short
+git branch --show-current
+
+Local branch များကို ကြည့်ရန်:
+
+git branch
+git branch -a
+
+အခြား branch သို့ ပြောင်းရန်:
+
+git switch main
+git switch feature/employee-dashboard
+
+Branch အသစ် ဖန်တီးရန်:
+
+git switch -c feature/new-work
+
+ပြောင်းလဲထားသော ဖိုင်များကို စစ်ရန်:
+
+git diff
+
+ဤ command သည် stage မလုပ်ရသေးသော ဖိုင်ပြောင်းလဲမှုများကို ပြသည်။
+
+git diff --cached
+
+ဤ command သည် commit ထဲထည့်ရန် stage လုပ်ထားသော ပြောင်းလဲမှုများကို ပြသည်။
+
+Commit မှတ်တမ်းကို ကြည့်ရန်:
+
+git log --oneline
+git log --oneline --graph --decorate --all
+
+Remote URL များကို ကြည့်ရန်:
+
+git remote -v
+
+GitHub မှ နောက်ဆုံးအပြောင်းအလဲများကို ဆွဲယူပြီး လက်ရှိ branch ထဲ ပေါင်းရန်:
+
+git pull origin main
+
+GitHub မှ အချက်အလက်အသစ်များကို ရယူသော်လည်း လက်ရှိဖိုင်များနှင့် မပေါင်းသေးရန်:
+
+git fetch origin
+
+ပြောင်းလဲမှုအားလုံးကို stage လုပ်ရန်:
+
+git add .
+
+ဖိုင်တစ်ခုကိုသာ stage လုပ်ရန်:
+
+git add app/page.tsx
+
+Commit လုပ်ရန်:
+
+git commit -m "fix: correct login validation"
+
+Branch ကို GitHub သို့ ပထမဆုံး push လုပ်ရန်:
+
+git push -u origin feature/new-work
+
+Remote tracking ချိတ်ပြီးသား branch ကို push လုပ်ရန်:
+
+git push
+
+Stage လုပ်ထားသောဖိုင်ကို stage မှ ပြန်ဖယ်ပြီး ဖိုင်ထဲက ပြောင်းလဲမှုကို ဆက်ထားရန်:
+
+git restore --staged app/page.tsx
+
+Stage မလုပ်ရသေးသော ဖိုင်ပြောင်းလဲမှုကို ပြန်ဖျက်ရန်:
+
+git restore app/page.tsx
+
+သတိပြုရန်: git restore app/page.tsx သည် အဲဒီဖိုင်ထဲက သင့်ပြင်ဆင်ချက်များကို ဖယ်ရှားမည်။ ပြောင်းလဲမှုကို မလိုတော့ကြောင်း သေချာမှသာ သုံးပါ။
+
+Local branch ဖျက်ရန်:
+
+git branch -d feature/old-work
+
+GitHub ပေါ်ရှိ branch ဖျက်ရန်:
+
+git push origin --delete feature/old-work
+
+GitHub repository ကို ကွန်ပျူတာအသစ်သို့ ကူးယူရန်:
+
+git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+
+Git clone သည် project ကို remote repository မှ ကူးယူပြီး origin remote ကိုလည်း အလိုအလျောက် သတ်မှတ်ပေးသည်။
+
+Git config နာမည်နှင့် email ကို ကြည့်ရန်:
+
+git config --global --get user.name
+git config --global --get user.email
+
+Restore command သည် ဖိုင်အပြောင်းအလဲကို ဖယ်ရှားနိုင်သဖြင့် မသုံးမီ git diff နှင့် git status ကို စစ်ပါ။
+
+တွေ့နိုင်သော အမှားများနှင့် ဖြေရှင်းနည်း
+---------------------------------------
+
+- "not a git repository" ဆိုပါက project folder မှန်မမှန် စစ်ပါ။ Git မစတင်ရသေးမှသာ git init -b main ကို အသုံးပြုပါ။
+- "remote origin already exists" ဆိုပါက git remote -v ဖြင့် စစ်ပါ။ URL ပြောင်းရန် git remote set-url origin URL ကို သုံးပါ။
+- Push လုပ်ရာတွင် GitHub sign-in မေးပါက GitHub account ကို authenticate လုပ်ပါ။
+- GitHub repository တွင် README ရှိပြီး local repository တွင်လည်း သီးခြားအစ commit ရှိပါက မှတ်တမ်းများကွဲနေသောကြောင့် push အမှားဖြစ်နိုင်သည်။ Local project အတွက် GitHub repository ကို အလွတ်ဖန်တီးပါက ပထမဆုံး push လုပ်ရလွယ်ကူသည်။
+- .gitignore သည် ယခင်က commit လုပ်ထားသောဖိုင်ကို Git မှ အလိုအလျောက် ဖယ်မပေးပါ။ ထိုဖိုင်ကို Git index မှဖယ်ရန် git rm --cached -- filename ကို အသုံးပြုပါ။
+- Secret တန်ဖိုး GitHub ပေါ်ရောက်သွားပါက .gitignore ထည့်ခြင်း သို့မဟုတ် commit ဖျက်ခြင်းဖြင့် အဲဒီ secret ကို ပိတ်သိမ်းမပေးနိုင်ပါ။ သက်ဆိုင်ရာ service/provider တွင် secret အသစ်ပြောင်းပါ။
+- Commit တစ်ခုစီမလုပ်မီ git status, git diff နှင့် git diff --cached ကို အသုံးပြုပြီး commit ထဲပါမည့်အရာများကို စစ်ဆေးပါ။
+
+တရားဝင်ကိုးကားရန်
+--------------------
+
+GitHub: Local project ကို GitHub သို့ ထည့်ခြင်း
+https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github
+
+GitHub: လျှို့ဝှက်ဒေတာကို ကာကွယ်ခြင်းနှင့် ဖယ်ရှားခြင်း
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository
+
+Git: Branch ဖန်တီးခြင်းနှင့် အခြား branch သို့ ပြောင်းခြင်း
+https://git-scm.com/docs/git-switch.html
+
+Git: ပြောင်းလဲမှုများကို remote သို့ push လုပ်ခြင်း
+https://git-scm.com/docs/git-push
