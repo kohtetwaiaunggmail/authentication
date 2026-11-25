@@ -8,3 +8,4 @@ coverage/
 !.env.example
 *.tsbuildinfo
 note.txt
+GITHUB_GIT_GUIDE_MM.txt
